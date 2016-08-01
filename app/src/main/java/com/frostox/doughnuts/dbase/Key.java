@@ -11,8 +11,9 @@ public class Key {
 
     private Long id;
     /** Not-null value. */
-    private String name;
-    private Short value;
+    private String access;
+    /** Not-null value. */
+    private String refresh;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -24,10 +25,10 @@ public class Key {
         this.id = id;
     }
 
-    public Key(Long id, String name, Short value) {
+    public Key(Long id, String access, String refresh) {
         this.id = id;
-        this.name = name;
-        this.value = value;
+        this.access = access;
+        this.refresh = refresh;
     }
 
     public Long getId() {
@@ -39,21 +40,23 @@ public class Key {
     }
 
     /** Not-null value. */
-    public String getName() {
-        return name;
+    public String getAccess() {
+        return access;
     }
 
     /** Not-null value; ensure this value is available before it is saved to the database. */
-    public void setName(String name) {
-        this.name = name;
+    public void setAccess(String access) {
+        this.access = access;
     }
 
-    public Short getValue() {
-        return value;
+    /** Not-null value. */
+    public String getRefresh() {
+        return refresh;
     }
 
-    public void setValue(Short value) {
-        this.value = value;
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setRefresh(String refresh) {
+        this.refresh = refresh;
     }
 
     // KEEP METHODS - put your custom methods here

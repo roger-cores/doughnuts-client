@@ -24,8 +24,8 @@ public class KeyDao extends AbstractDao<Key, Long> {
     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property Name = new Property(1, String.class, "name", false, "NAME");
-        public final static Property Value = new Property(2, Short.class, "value", false, "VALUE");
+        public final static Property Access = new Property(1, String.class, "access", false, "ACCESS");
+        public final static Property Refresh = new Property(2, String.class, "refresh", false, "REFRESH");
     };
 
 
@@ -42,8 +42,8 @@ public class KeyDao extends AbstractDao<Key, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'KEY' (" + //
                 "'_id' INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "'NAME' TEXT NOT NULL ," + // 1: name
-                "'VALUE' INTEGER);"); // 2: value
+                "'ACCESS' TEXT NOT NULL ," + // 1: access
+                "'REFRESH' TEXT NOT NULL );"); // 2: refresh
     }
 
     /** Drops the underlying database table. */
@@ -61,12 +61,8 @@ public class KeyDao extends AbstractDao<Key, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindString(2, entity.getName());
- 
-        Short value = entity.getValue();
-        if (value != null) {
-            stmt.bindLong(3, value);
-        }
+        stmt.bindString(2, entity.getAccess());
+        stmt.bindString(3, entity.getRefresh());
     }
 
     /** @inheritdoc */
@@ -80,8 +76,8 @@ public class KeyDao extends AbstractDao<Key, Long> {
     public Key readEntity(Cursor cursor, int offset) {
         Key entity = new Key( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.getString(offset + 1), // name
-            cursor.isNull(offset + 2) ? null : cursor.getShort(offset + 2) // value
+            cursor.getString(offset + 1), // access
+            cursor.getString(offset + 2) // refresh
         );
         return entity;
     }
@@ -90,8 +86,8 @@ public class KeyDao extends AbstractDao<Key, Long> {
     @Override
     public void readEntity(Cursor cursor, Key entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setName(cursor.getString(offset + 1));
-        entity.setValue(cursor.isNull(offset + 2) ? null : cursor.getShort(offset + 2));
+        entity.setAccess(cursor.getString(offset + 1));
+        entity.setRefresh(cursor.getString(offset + 2));
      }
     
     /** @inheritdoc */
