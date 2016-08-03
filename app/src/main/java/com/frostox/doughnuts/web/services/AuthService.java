@@ -1,8 +1,6 @@
-package com.frostox.doughnuts.web;
+package com.frostox.doughnuts.web.services;
 
 import android.app.Activity;
-import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.frostox.doughnuts.R;
@@ -13,7 +11,7 @@ import com.frostox.doughnuts.web.webmodels.LoginRequest;
 import com.frostox.doughnuts.web.webmodels.LoginResponse;
 import com.frostox.doughnuts.web.webmodels.Response;
 import com.frostox.doughnuts.web.webmodels.ValidateRequest;
-import com.frostox.doughnuts.web.webservices.AuthenticationService;
+import com.frostox.doughnuts.web.endpoints.AuthenticationService;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -26,7 +24,7 @@ import retrofit2.Converter;
 /**
  * Created by bloss on 2/8/16.
  */
-public class Utility {
+public class AuthService {
 
 
 
@@ -67,7 +65,7 @@ public class Utility {
                                 else {
                                     Toast.makeText(context, context.getString(R.string.error_session), Toast.LENGTH_LONG).show();
                                     if(context instanceof MainActivity)
-                                        ((MainActivity) context).goTo(MainActivity.LOG_IN);
+                                        ((MainActivity) context).goTo(MainActivity.LOG_IN, MainActivity.defaultDelay);
                                 }
 
                                 break;
@@ -87,7 +85,7 @@ public class Utility {
                 Response validationResponse = response.body();
                 if(validationResponse!=null && validationResponse.getCode() != null && validationResponse.getCode() == 1) {
                     if(context instanceof MainActivity)
-                        ((MainActivity) context).goTo(MainActivity.HOME);
+                        ((MainActivity) context).goTo(MainActivity.HOME, MainActivity.defaultDelay);
                 } else {
                     Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
                 }
@@ -107,7 +105,7 @@ public class Utility {
 
         if(key.getRefresh().equals("")) {
             if(context instanceof MainActivity)
-                ((MainActivity) context).goTo(MainActivity.LOG_IN);
+                ((MainActivity) context).goTo(MainActivity.LOG_IN, MainActivity.defaultDelay);
             return;
         }
 
@@ -131,15 +129,20 @@ public class Utility {
                     try {
                         Response error = errorConverter.convert(response.errorBody());
 
-                        switch (error.getCode()){
-                            case -1:
-                            case -2:
+                        switch (error.getError()){
+                            case "invalid_request":
+                            case "invalid_grant":
                                 Toast.makeText(context, context.getString(R.string.error_session), Toast.LENGTH_LONG).show();
                                 if(context instanceof MainActivity)
-                                    ((MainActivity) context).goTo(MainActivity.LOG_IN);
+                                    ((MainActivity) context).goTo(MainActivity.LOG_IN, MainActivity.defaultDelay);
                                 break;
-                            case -3:
-                            case 0:
+
+
+                            case "unauthorized_client":
+                            case "unsupported_grant_type":
+                            case "invalid_scope":
+                            case "server_error":
+                            case "invalid_client":
                                 Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
                                 break;
                         }
@@ -199,6 +202,11 @@ public class Utility {
                 Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
             }
         });
+
+    }
+
+
+    public void signUp(Activity activity, final AuthenticationService authenticationService, String email, String password, String nickname){
 
     }
 }

@@ -1,5 +1,6 @@
-package com.frostox.doughnuts.web.webservices;
+package com.frostox.doughnuts.web.endpoints;
 
+import com.frostox.doughnuts.web.webmodels.CreatedResponse;
 import com.frostox.doughnuts.web.webmodels.LoginRequest;
 import com.frostox.doughnuts.web.webmodels.LoginResponse;
 import com.frostox.doughnuts.web.webmodels.Response;
@@ -29,6 +30,15 @@ public interface AuthenticationService {
      */
     @POST("user/validate-token")
     public Call<Response> validateToken(@Body ValidateRequest validateRequest);
+
+
+    /**
+     * Signs up a user
+     * @param loginRequest
+     * @return id and version of the created user
+     */
+    @POST("user/signup")
+    public Call<CreatedResponse> signUp(@Body LoginRequest loginRequest);
 
 
 

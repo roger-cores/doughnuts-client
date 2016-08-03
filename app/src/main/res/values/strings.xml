@@ -4,6 +4,7 @@
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
+    <string name="prompt_repassword">Repeat password</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_invalid_email">This email address is invalid</string>
@@ -31,6 +32,12 @@
     <string name="error_contingency">Someone spoiled the recipe! Please wait while we behead them.</string>
     <string name="error_session">I misplaced your name, friend. Log in again!</string>
 
+    <string name="email_missing">You thought you could login without an email?</string>
+    <string name="email_invalid">That looks like a fake email to me!</string>
+    <string name="password_length">Passwords can\'t be shorter than your ****. At least 5 chars dude!</string>
+
+    <string name="invalid_user_credentials">I don\'t know you yet! Sign Up now!</string>
+
     <!--- Web Services Related Strings -->
     <string name="base_url">http://192.168.0.106:3000/api/</string>
 
@@ -39,4 +46,7 @@
     <string name="grant_password">password</string>
     <string name="grant_refresh">refresh_token</string>
     <string name="grant_access">access_token</string>
+
+    <!--- Web Service Error Descs -->
+    <string name="invalid_credentials">Invalid resource owner credentials</string>
 </resources>
