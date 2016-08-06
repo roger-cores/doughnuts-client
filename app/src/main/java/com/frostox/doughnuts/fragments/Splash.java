@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.frostox.doughnuts.R;
 import com.frostox.doughnuts.activities.MainActivity;
@@ -15,19 +14,8 @@ import com.frostox.doughnuts.dbase.DaoMaster;
 import com.frostox.doughnuts.dbase.DaoSession;
 import com.frostox.doughnuts.dbase.Key;
 import com.frostox.doughnuts.dbase.Utility;
-import com.frostox.doughnuts.web.webmodels.LoginRequest;
-import com.frostox.doughnuts.web.webmodels.LoginResponse;
-import com.frostox.doughnuts.web.webmodels.Response;
-import com.frostox.doughnuts.web.webmodels.ValidateRequest;
-import com.frostox.doughnuts.web.webservices.AuthenticationService;
-
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Converter;
+import com.frostox.doughnuts.web.endpoints.AuthenticationService;
+import com.frostox.doughnuts.web.services.AuthService;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -91,12 +79,12 @@ public class Splash extends Fragment {
         final Key key = Utility.getKey(getActivity().getApplicationContext());
         if(key == null) {
             Utility.insertKey(getActivity().getApplicationContext(), "", "");
-            ((MainActivity) getActivity()).goTo(MainActivity.LOG_IN);
+            ((MainActivity) getActivity()).goTo(MainActivity.LOG_IN, MainActivity.defaultDelay);
         } else {
             //Check accessToken, refreshToken
             final AuthenticationService authenticationService = ((MainActivity) getActivity()).getRetrofit().create(AuthenticationService.class);
 
-            com.frostox.doughnuts.web.Utility.validateAccessToken(getActivity(), true, key, authenticationService);
+            AuthService.validateAccessToken(getActivity(), true, key, authenticationService);
 
 
 
@@ -226,7 +214,7 @@ public class Splash extends Fragment {
 //                }
 //
 //                if(response != null && response.body() != null){
-//                    Utility.updateKey(getActivity().getApplicationContext(), response.body().getAccessToken(), response.body().getRefreshToken());
+//                    AuthService.updateKey(getActivity().getApplicationContext(), response.body().getAccessToken(), response.body().getRefreshToken());
 //                    //validate again
 //                    validateAccessToken(false, key, authenticationService);
 //                }  else {
@@ -258,6 +246,11 @@ public class Splash extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+
+
+
+
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {

@@ -1,12 +1,15 @@
 package com.frostox.doughnuts.web.services;
 
 import android.app.Activity;
-import android.widget.Toast;
+import android.graphics.Color;
+import android.support.design.widget.Snackbar;
 
 import com.frostox.doughnuts.R;
 import com.frostox.doughnuts.activities.MainActivity;
 import com.frostox.doughnuts.app.Doughnuts;
 import com.frostox.doughnuts.dbase.Key;
+import com.frostox.doughnuts.dbase.Utility;
+import com.frostox.doughnuts.web.webmodels.CreatedResponse;
 import com.frostox.doughnuts.web.webmodels.LoginRequest;
 import com.frostox.doughnuts.web.webmodels.LoginResponse;
 import com.frostox.doughnuts.web.webmodels.Response;
@@ -21,6 +24,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Converter;
 
+import static com.frostox.doughnuts.utilities.Utility.displayContingencyError;
+import static com.frostox.doughnuts.utilities.Utility.displayError;
+
 /**
  * Created by bloss on 2/8/16.
  */
@@ -28,18 +34,18 @@ public class AuthService {
 
 
 
-    public static void validateAccessToken(Activity activity, final boolean validateRefresh, Key key, final AuthenticationService authenticationService){
-        final Activity context = activity;
+    public static void validateAccessToken(final Activity activity, final boolean validateRefresh, Key key, final AuthenticationService authenticationService){
+        
         if(key.getAccess().equals("")) {
-            refreshToken(context, key, authenticationService);
+            refreshToken(activity, key, authenticationService);
             return;
         }
 
         final ValidateRequest validateRequest = new ValidateRequest();
         validateRequest.setAccessToken(key.getAccess());
-        validateRequest.setClientId(context.getString(R.string.client_id));
-        validateRequest.setClientSecret(context.getString(R.string.client_secret));
-        validateRequest.setGrantType(context.getString(R.string.grant_access));
+        validateRequest.setClientId(activity.getString(R.string.client_id));
+        validateRequest.setClientSecret(activity.getString(R.string.client_secret));
+        validateRequest.setGrantType(activity.getString(R.string.grant_access));
         final Key key1 = key;
         final Call<Response> validateCall = authenticationService.validateToken(validateRequest);
 
@@ -50,7 +56,7 @@ public class AuthService {
                 if(response != null && !response.isSuccessful() && response.errorBody() != null){
 
                     Converter<ResponseBody, Response> errorConverter =
-                            ((Doughnuts) context.getApplication()).getClient().responseBodyConverter(Response.class, new Annotation[0]);
+                            ((Doughnuts) activity.getApplication()).getClient().responseBodyConverter(Response.class, new Annotation[0]);
                     try {
                         Response error = errorConverter.convert(response.errorBody());
 
@@ -60,21 +66,22 @@ public class AuthService {
                                 //token expired
                                 //try refresh token
                                 if(validateRefresh) {
-                                    refreshToken(context, key1, authenticationService);
+                                    refreshToken(activity, key1, authenticationService);
                                 }
                                 else {
-                                    Toast.makeText(context, context.getString(R.string.error_session), Toast.LENGTH_LONG).show();
-                                    if(context instanceof MainActivity)
-                                        ((MainActivity) context).goTo(MainActivity.LOG_IN, MainActivity.defaultDelay);
+                                    displayError(activity, R.string.error_session);
+                                    if(activity instanceof MainActivity)
+                                        ((MainActivity) activity).goTo(MainActivity.LOG_IN, MainActivity.defaultDelay);
                                 }
 
                                 break;
                             case -3:
-                                Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
+                                displayContingencyError(activity);
                                 break;
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                        displayContingencyError(activity);
                     }
                     System.out.print("");
 
@@ -84,37 +91,35 @@ public class AuthService {
 
                 Response validationResponse = response.body();
                 if(validationResponse!=null && validationResponse.getCode() != null && validationResponse.getCode() == 1) {
-                    if(context instanceof MainActivity)
-                        ((MainActivity) context).goTo(MainActivity.HOME, MainActivity.defaultDelay);
+                    if(activity instanceof MainActivity)
+                        ((MainActivity) activity).goTo(MainActivity.HOME, MainActivity.defaultDelay);
                 } else {
-                    Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
+                    displayContingencyError(activity);
                 }
             }
 
             @Override
             public void onFailure(Call<Response> call, Throwable t) {
-                Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
+                displayContingencyError(activity);
             }
         });
     }
 
 
-    public static void refreshToken(Activity activity, final Key key, final AuthenticationService authenticationService){
-
-        final Activity context = activity;
+    public static void refreshToken(final Activity activity, final Key key, final AuthenticationService authenticationService){
 
         if(key.getRefresh().equals("")) {
-            if(context instanceof MainActivity)
-                ((MainActivity) context).goTo(MainActivity.LOG_IN, MainActivity.defaultDelay);
+            if(activity instanceof MainActivity)
+                ((MainActivity) activity).goTo(MainActivity.LOG_IN, MainActivity.defaultDelay);
             return;
         }
 
 
 
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setGrantType(context.getString(R.string.grant_refresh));
-        loginRequest.setClientSecret(context.getString(R.string.client_secret));
-        loginRequest.setClientId(context.getString(R.string.client_id));
+        loginRequest.setGrantType(activity.getString(R.string.grant_refresh));
+        loginRequest.setClientSecret(activity.getString(R.string.client_secret));
+        loginRequest.setClientId(activity.getString(R.string.client_id));
         loginRequest.setRefreshToken(key.getRefresh());
         Call<LoginResponse> refreshToken = authenticationService.login(loginRequest);
 
@@ -125,16 +130,16 @@ public class AuthService {
                 if(response != null && !response.isSuccessful() && response.errorBody() != null) {
 
                     Converter<ResponseBody, Response> errorConverter =
-                            ((Doughnuts) context.getApplication()).getClient().responseBodyConverter(Response.class, new Annotation[0]);
+                            ((Doughnuts) activity.getApplication()).getClient().responseBodyConverter(Response.class, new Annotation[0]);
                     try {
                         Response error = errorConverter.convert(response.errorBody());
 
                         switch (error.getError()){
                             case "invalid_request":
                             case "invalid_grant":
-                                Toast.makeText(context, context.getString(R.string.error_session), Toast.LENGTH_LONG).show();
-                                if(context instanceof MainActivity)
-                                    ((MainActivity) context).goTo(MainActivity.LOG_IN, MainActivity.defaultDelay);
+                                displayError(activity, R.string.error_session);
+                                if(activity instanceof MainActivity)
+                                    ((MainActivity) activity).goTo(MainActivity.LOG_IN, MainActivity.defaultDelay);
                                 break;
 
 
@@ -143,44 +148,44 @@ public class AuthService {
                             case "invalid_scope":
                             case "server_error":
                             case "invalid_client":
-                                Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
+                                displayContingencyError(activity);
                                 break;
                         }
 
 
                     } catch (IOException e){
                         e.printStackTrace();
+                        displayContingencyError(activity);
                     }
 
                     return;
                 }
 
                 if(response != null && response.body() != null){
-                    com.frostox.doughnuts.dbase.Utility.updateKey(context.getApplicationContext(), response.body().getAccessToken(), response.body().getRefreshToken());
+                    com.frostox.doughnuts.dbase.Utility.updateKey(activity.getApplicationContext(), response.body().getAccessToken(), response.body().getRefreshToken());
                     //validate again
-                    validateAccessToken(context, false, key, authenticationService);
+                    validateAccessToken(activity, false, key, authenticationService);
                 }  else {
-                    Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
+                    displayContingencyError(activity);
                 }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
+                displayContingencyError(activity);
             }
         });
     }
 
 
-    public static void login(Activity activity, final AuthenticationService authenticationService, String email, String password){
-        final Activity context = activity;
-
+    public static void login(final Activity activity, final AuthenticationService authenticationService, String email, String password){
+        
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setUsername(email);
         loginRequest.setPassword(password);
-        loginRequest.setClientSecret(context.getString(R.string.client_secret));
-        loginRequest.setClientId(context.getString(R.string.client_id));
-        loginRequest.setGrantType(context.getString(R.string.grant_password));
+        loginRequest.setClientSecret(activity.getString(R.string.client_secret));
+        loginRequest.setClientId(activity.getString(R.string.client_id));
+        loginRequest.setGrantType(activity.getString(R.string.grant_password));
 
         Call<LoginResponse> login = authenticationService.login(loginRequest);
 
@@ -188,25 +193,79 @@ public class AuthService {
             @Override
             public void onResponse(Call<LoginResponse> call, retrofit2.Response<LoginResponse> response) {
                 if(response != null && !response.isSuccessful() && response.errorBody() != null){
-                    Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
+
+
+                    Converter<ResponseBody, Response> errorConverter =
+                            ((Doughnuts) activity.getApplication()).getClient().responseBodyConverter(Response.class, new Annotation[0]);
+                    try {
+                        Response error = errorConverter.convert(response.errorBody());
+                        if(error != null && error.getErrorDescription() != null && error.getErrorDescription().equals(activity.getString(R.string.invalid_credentials))){
+                            displayError(activity, R.string.invalid_user_credentials);
+                        } else displayContingencyError(activity);
+                    } catch(IOException e){
+                        e.printStackTrace();
+                        displayContingencyError(activity);
+                    }
+
                 } else if(response != null && response.body() != null && response.body().getAccessToken() != null && response.body().getRefreshToken() != null){
-                    com.frostox.doughnuts.dbase.Utility.updateKey(context, response.body().getAccessToken(), response.body().getRefreshToken());
-                    validateAccessToken(context, false, com.frostox.doughnuts.dbase.Utility.getKey(context), authenticationService);
+                    com.frostox.doughnuts.dbase.Utility.updateKey(activity, response.body().getAccessToken(), response.body().getRefreshToken());
+                    validateAccessToken(activity, false, com.frostox.doughnuts.dbase.Utility.getKey(activity), authenticationService);
                 } else {
-                    Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
+                    displayContingencyError(activity);
                 }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                Toast.makeText(context, context.getString(R.string.error_contingency), Toast.LENGTH_LONG).show();
+                displayContingencyError(activity);
             }
         });
 
     }
 
 
-    public void signUp(Activity activity, final AuthenticationService authenticationService, String email, String password, String nickname){
+    public static void signUp(final Activity activity, final AuthenticationService authenticationService, final String email, final String password, String nickname){
 
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername(email);
+        loginRequest.setPassword(password);
+        loginRequest.setNickName(nickname);
+        loginRequest.setClientSecret(activity.getString(R.string.client_secret));
+        loginRequest.setClientId(activity.getString(R.string.client_id));
+
+        Call<CreatedResponse> signUp = authenticationService.signUp(loginRequest);
+
+        signUp.enqueue(new Callback<CreatedResponse>() {
+            @Override
+            public void onResponse(Call<CreatedResponse> call, retrofit2.Response<CreatedResponse> response) {
+                if(response != null && !response.isSuccessful() && response.errorBody() != null){
+                    Converter<ResponseBody, Response> errorConverter =
+                            ((Doughnuts) activity.getApplication()).getClient().responseBodyConverter(Response.class, new Annotation[0]);
+                    try {
+                        Response error = errorConverter.convert(response.errorBody());
+                        if(error.getError().equals("user exists")){
+                            displayError(activity, R.string.email_used);
+                        } else if(error.getError().equals("nickname exists")){
+                            displayError(activity, R.string.nickname_used);
+                        } else displayContingencyError(activity);
+                    } catch(IOException e){
+                        e.printStackTrace();
+                        displayContingencyError(activity);
+                    }
+
+                } else if(response != null && response.body() != null){
+                    Utility.updateKey(activity, "", "");
+                    login(activity, authenticationService, email, password);
+                } else displayContingencyError(activity);
+            }
+
+            @Override
+            public void onFailure(Call<CreatedResponse> call, Throwable t) {
+                displayContingencyError(activity);
+            }
+        });
     }
+    
+
+    
 }

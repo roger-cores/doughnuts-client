@@ -7,6 +7,7 @@
     android:paddingTop="?android:attr/actionBarSize">
 
     <RelativeLayout
+        android:id="@+id/mainContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="10dp"
@@ -78,6 +79,8 @@
             android:layout_below="@id/login"
             android:text="Forgot Password"
             android:textColor="@color/white"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             style="@style/Widget.AppCompat.Button.Borderless"/>
 
@@ -87,6 +90,7 @@
             android:layout_height="100dp"
             android:src="@drawable/donut"
             android:layout_alignParentTop="true"/>
+
 
         <TextView
             android:id="@+id/app_label"
@@ -101,14 +105,43 @@
             android:textStyle="bold"/>
 
         <Button
-            android:layout_width="wrap_content"
+            android:id="@+id/sign_up"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="10dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
             android:text="Create a new account"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:textColor="@color/white"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/waito"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:progress="30"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_below="@+id/progressBar"
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:text="Ahem.. A moment please.."/>
+
     </RelativeLayout>
 
 </FrameLayout>

@@ -1,7 +1,10 @@
 package com.frostox.doughnuts.activities;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.net.Uri;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,11 +12,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.frostox.doughnuts.R;
 import com.frostox.doughnuts.app.Doughnuts;
 import com.frostox.doughnuts.fragments.Home;
 import com.frostox.doughnuts.fragments.Login;
+import com.frostox.doughnuts.fragments.Register;
 import com.frostox.doughnuts.fragments.Splash;
 
 import retrofit2.Retrofit;
@@ -22,11 +27,15 @@ import retrofit2.Retrofit;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class MainActivity extends AppCompatActivity implements Splash.OnFragmentInteractionListener, Home.OnFragmentInteractionListener, Login.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements Splash.OnFragmentInteractionListener, Home.OnFragmentInteractionListener, Login.OnFragmentInteractionListener, Register.OnFragmentInteractionListener {
 
-    public final static int LOG_IN = 1, HOME = 2;
+    public final static int LOG_IN = 1, HOME = 2, SPLASH = 3, REGISTER =4;
+
+    public final static int defaultDelay = 3000, noDelay = 0;
 
     private Retrofit retrofit;
+
+    private int status = SPLASH;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -132,7 +141,8 @@ public class MainActivity extends AppCompatActivity implements Splash.OnFragment
         // Trigger the initial hide() shortly after the activity has been
         // created, to briefly hint to the user that UI controls
         // are available.
-        delayedHide(100);
+
+        delayedHide(0);
     }
 
     private void toggle() {
@@ -191,9 +201,18 @@ public class MainActivity extends AppCompatActivity implements Splash.OnFragment
         this.retrofit = retrofit;
     }
 
-    public void goTo(int destination){
+    public void goTo(int destination, int delay){
+
+
+
         switch (destination){
             case HOME:
+
+                if(status == HOME){
+
+                    return;
+                }
+
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -203,13 +222,20 @@ public class MainActivity extends AppCompatActivity implements Splash.OnFragment
                         fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
                         fragmentTransaction.replace(R.id.fullscreen_content, new Home());
                         fragmentTransaction.commit();
-
+                        status = HOME;
 
 
                     }
-                }, 3000);
+                }, delay);
                 break;
             case LOG_IN:
+
+                if(status == LOG_IN){
+
+
+                    return;
+                }
+
                 final Handler handler1 = new Handler();
                 handler1.postDelayed(new Runnable() {
                     @Override
@@ -219,11 +245,35 @@ public class MainActivity extends AppCompatActivity implements Splash.OnFragment
                         fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
                         fragmentTransaction.replace(R.id.fullscreen_content, new Login());
                         fragmentTransaction.commit();
-
+                        status = LOG_IN;
 
 
                     }
-                }, 3000);
+                }, delay);
+                break;
+
+            case REGISTER:
+
+                if(status == REGISTER){
+
+                    return;
+                }
+
+                final Handler handler2 = new Handler();
+                handler2.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSupportActionBar().setTitle("Login into Doughnuts");
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+                        fragmentTransaction.replace(R.id.fullscreen_content, new Register());
+                        fragmentTransaction.commit();
+                        status = REGISTER;
+
+
+                    }
+                }, delay);
+
                 break;
         }
     }

@@ -1,7 +1,6 @@
 package com.frostox.doughnuts.fragments;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,14 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 
 import com.frostox.doughnuts.R;
 import com.frostox.doughnuts.activities.MainActivity;
-import com.frostox.doughnuts.app.Doughnuts;
-import com.frostox.doughnuts.dbase.DaoMaster;
-import com.frostox.doughnuts.dbase.DaoSession;
-import com.frostox.doughnuts.web.Utility;
-import com.frostox.doughnuts.web.webservices.AuthenticationService;
+import com.frostox.doughnuts.web.services.AuthService;
+import com.frostox.doughnuts.web.endpoints.AuthenticationService;
+
+import static com.frostox.doughnuts.utilities.Utility.displayError;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -89,6 +88,13 @@ public class Login extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
+        ((Button) view.findViewById(R.id.sign_up)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).goTo(MainActivity.REGISTER, MainActivity.noDelay);
+            }
+        });
+
         ((Button) view.findViewById(R.id.login)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -96,21 +102,25 @@ public class Login extends Fragment {
                 String password = Login.this.password.getText().toString();
 
                 if(email.equals("")){
-
+                    displayError(getActivity(), R.string.email_missing, "login");
                 } else if(!email.contains("@")){
-
+                    displayError(getActivity(), R.string.email_invalid);
                 } else if(!email.contains(".")){
-
+                    displayError(getActivity(), R.string.email_invalid);
                 } else if(email.contains(" ")){
-
+                    displayError(getActivity(), R.string.email_invalid);
                 } else if((email.lastIndexOf(".") < email.indexOf("@"))){
-
+                    displayError(getActivity(), R.string.email_invalid);
+                } else if(email.endsWith(".") || email.endsWith("@")) {
+                    displayError(getActivity(), R.string.email_invalid);
                 } else if(password.length() < 5){
-
+                    displayError(getActivity(), R.string.password_length);
                 } else {
                     //log in here
                     AuthenticationService authenticationService = ((MainActivity) getActivity()).getRetrofit().create(AuthenticationService.class);
-                    Utility.login(getActivity(), authenticationService, email, password);
+                    AuthService.login(getActivity(), authenticationService, email, password);
+
+                    showProgress();
 
                 }
             }
@@ -123,6 +133,28 @@ public class Login extends Fragment {
 
 
         return view;
+    }
+
+    public void showProgress(){
+        RelativeLayout mainContent, waito;
+        EditText appLabel;
+
+        mainContent = (RelativeLayout) getView().findViewById(R.id.mainContent);
+        waito = (RelativeLayout) getView().findViewById(R.id.waito);
+
+
+        mainContent.setVisibility(View.GONE);
+        waito.setVisibility(View.VISIBLE);
+    }
+
+    public void hideProgress(){
+        RelativeLayout mainContent, waito;
+
+        mainContent = (RelativeLayout) getView().findViewById(R.id.mainContent);
+        waito = (RelativeLayout) getView().findViewById(R.id.waito);
+
+        mainContent.setVisibility(View.VISIBLE);
+        waito.setVisibility(View.GONE);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

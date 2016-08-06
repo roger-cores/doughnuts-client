@@ -29,20 +29,15 @@
 
 
     <!-- Error Messages -->
-    <string name="error_contingency">Someone spoiled the recipe!\nPlease wait while we behead them.</string>
+    <string name="error_contingency">Someone spoiled the recipe! Please wait while we behead them.</string>
     <string name="error_session">I misplaced your name, friend. Log in again!</string>
 
-    <string name="email_missing">You thought you could %1$s without an email?</string>
+    <string name="email_missing">You thought you could login without an email?</string>
     <string name="email_invalid">That looks like a fake email to me!</string>
-    <string name="password_length">Passwords can\'t be shorter than your ****.\nAt least 5 chars dude!</string>
-    <string name="repassword">Bro, the passwords. They need to match!</string>
-    <string name="invalid_user_credentials">I don\'t know you yet! Sign Up now!</string>
-    <string name="email_used">Someone claimed this email long ago!\nChose another one.</string>
-    <string name="nickname_missing">I refuse to believe that you don\'t have a nickname!</string>
-    <string name="nickname_too_small">Those are alphabets, not a nickname!\nChoose a longer one bro!</string>
-    <string name="nickname_too_long">Nickname, not an address!\nnickname can be 3 to 10 chars!</string>
-    <string name="nickname_invalid">Whoah! What are you, a hacker?\n nicknames can\'t contain special characters!</string>
-    <string name="nickname_used">Nickname has been claimed before.\nChoose another!</string>
+    <string name="password_length">Passwords can\'t be shorter than your ****. At least 5 chars dude!</string>
+
+    <string name="invalid_user_credentials">I don't know you yet! Sign Up now!</string>
+
     <!--- Web Services Related Strings -->
     <string name="base_url">http://192.168.0.106:3000/api/</string>
 

@@ -3,7 +3,7 @@ package com.frostox.doughnuts.web.webmodels;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by bloss on 1/8/16.
+ * Created by Roger Cores on 1/8/16.
  */
 public class LoginRequest {
 
@@ -11,6 +11,9 @@ public class LoginRequest {
     private String username;
 
     private String password;
+
+    @SerializedName("nickname")
+    private String nickName;
 
     @SerializedName("refresh_token")
     private String refreshToken;
@@ -70,5 +73,13 @@ public class LoginRequest {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 }
